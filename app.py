@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from analyzer import analyze_text
 
@@ -8,7 +8,11 @@ app = FastAPI()
 
 
 class TextRequest(BaseModel):
-    text: str
+    text: str = Field(
+        min_length=1,
+        max_length=5000,
+        description="Text that will be analyzed"
+    )
 
 
 @app.get("/")
