@@ -6,7 +6,12 @@ from fastapi import FastAPI, HTTPException, Request
 from ai_client import generate_ai_summary
 from analyzer import analyze_text
 from logger_config import configure_logging
-from schemas import SummaryResponse, TextAnalysisResponse, TextRequest
+from schemas import (
+    FullAnalysisResponse,
+    SummaryResponse,
+    TextAnalysisResponse,
+    TextRequest,
+)
 
 
 configure_logging()
@@ -51,6 +56,25 @@ def summarize(request: TextRequest):
     try:
         summary = generate_ai_summary(request.text)
         return {"summary": summary}
+    except ValueError as error:
+        raise HTTPException(status_code=500, detail=str(error))
+    except Exception:
+        raise HTTPException(
+            status_code=502,
+            detail="AI summary service is currently unavailable"
+        )
+    
+
+@app.post("/full-analysis", response_model=FullAnalysisResponse)
+def full_analysis(request: TextRequest):
+    analysis = analyze_text(request.text)
+
+    try:
+        summary = generate_ai_summary(request.text)
+        return {
+            "analysis": analysis,
+            "summary": summary,
+        }
     except ValueError as error:
         raise HTTPException(status_code=500, detail=str(error))
     except Exception:

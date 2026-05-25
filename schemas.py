@@ -18,3 +18,7 @@ class TextAnalysisResponse(BaseModel):
 
 class SummaryResponse(BaseModel):
     summary: str
+
+class FullAnalysisResponse(BaseModel):
+    analysis: TextAnalysisResponse
+    summary: str
