@@ -1,7 +1,19 @@
+import string
+
+def clean_word(word):
+    return word.strip(string.punctuation).lower()
+
 def count_words(text):
     words = text.split()
-    return len(words)
+    cleaned_words = []
 
+    for word in words:
+        cleaned_word = clean_word(word)
+
+        if cleaned_word:
+            cleaned_words.append(cleaned_word)
+
+    return len(cleaned_words)
 
 def count_characters(text):
     return len(text)
@@ -20,16 +32,23 @@ def count_sentences(text):
 
 def calculate_average_word_length(text):
     words = text.split()
+    cleaned_words = []
 
-    if len(words) == 0:
+    for word in words:
+        cleaned_word = clean_word(word)
+
+        if cleaned_word:
+            cleaned_words.append(cleaned_word)
+
+    if len(cleaned_words) == 0:
         return 0
 
     total_length = 0
 
-    for word in words:
+    for word in cleaned_words:
         total_length += len(word)
 
-    average = total_length / len(words)
+    average = total_length / len(cleaned_words)
     return round(average, 2)
 
 
