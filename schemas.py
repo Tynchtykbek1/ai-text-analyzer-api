@@ -15,3 +15,6 @@ class TextAnalysisResponse(BaseModel):
     character_count: int
     sentence_count: int
     average_word_length: float
+
+class SummaryResponse(BaseModel):
+    summary: str

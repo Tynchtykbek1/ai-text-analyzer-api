@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 
+from ai_client import generate_ai_summary
 from analyzer import analyze_text
-from schemas import TextAnalysisResponse, TextRequest
+from schemas import SummaryResponse, TextAnalysisResponse, TextRequest
 
 
 app = FastAPI()
@@ -16,3 +17,9 @@ def home():
 def analyze(request: TextRequest):
     result = analyze_text(request.text)
     return result
+
+
+@app.post("/summarize", response_model=SummaryResponse)
+def summarize(request: TextRequest):
+    summary = generate_ai_summary(request.text)
+    return {"summary": summary}
