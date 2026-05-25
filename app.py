@@ -2,6 +2,7 @@ import logging
 import time
 
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
 
 from ai_client import generate_ai_summary
 from analyzer import analyze_text
@@ -43,6 +44,10 @@ async def log_requests(request: Request, call_next):
 @app.get("/")
 def home():
     return {"message": "AI Text Analyzer API is running"}
+
+@app.get("/ui")
+def ui():
+    return FileResponse("frontend/index.html")
 
 
 @app.post("/analyze", response_model=TextAnalysisResponse)
