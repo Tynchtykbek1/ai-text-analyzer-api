@@ -1,11 +1,38 @@
-from fastapi import FastAPI
+import logging
+import time
+
+from fastapi import FastAPI, HTTPException, Request
 
 from ai_client import generate_ai_summary
 from analyzer import analyze_text
+from logger_config import configure_logging
 from schemas import SummaryResponse, TextAnalysisResponse, TextRequest
-from fastapi import FastAPI, HTTPException
+
+
+configure_logging()
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.time()
+
+    response = await call_next(request)
+
+    process_time = round(time.time() - start_time, 4)
+
+    logger.info(
+        "%s %s - %s - %ss",
+        request.method,
+        request.url.path,
+        response.status_code,
+        process_time,
+    )
+
+    return response
 
 
 @app.get("/")
