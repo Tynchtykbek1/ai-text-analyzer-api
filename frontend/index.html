@@ -110,6 +110,11 @@
             transition: 0.2s ease;
         }
 
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
         .primary-btn {
             background: #38bdf8;
             color: #020617;
@@ -177,13 +182,25 @@
             font-weight: bold;
         }
 
-        .summary-box {
+        .summary-box,
+        .keywords-box {
             background: rgba(2, 6, 23, 0.75);
             border: 1px solid rgba(148, 163, 184, 0.14);
             padding: 18px;
             border-radius: 14px;
             line-height: 1.7;
             color: #dbeafe;
+        }
+
+        .keyword {
+            display: inline-block;
+            margin: 6px 6px 0 0;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.12);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.28);
+            font-size: 14px;
         }
 
         .footer {
@@ -214,8 +231,8 @@
             <div class="badge">FastAPI + Gemini AI</div>
             <h1>AI Text Analyzer</h1>
             <p class="subtitle">
-                Paste any text and get basic text statistics together with an AI-generated summary.
-                This project demonstrates backend APIs, validation, Gemini integration, testing, and Docker support.
+                Paste any text and get basic text statistics, an AI-generated summary,
+                and key topics extracted from the content.
             </p>
         </section>
 
@@ -226,7 +243,7 @@
                 <textarea id="textInput" placeholder="Paste your text here..."></textarea>
 
                 <div class="actions">
-                    <button class="primary-btn" onclick="analyzeText()">Analyze Text</button>
+                    <button id="analyzeButton" class="primary-btn" onclick="analyzeText()">Analyze Text</button>
                     <button class="secondary-btn" onclick="clearText()">Clear</button>
                     <button class="secondary-btn" onclick="loadExample()">Load Example</button>
                 </div>
@@ -267,6 +284,9 @@
 
                     <h2>AI Summary</h2>
                     <div id="summary" class="summary-box"></div>
+
+                    <h2>Keywords</h2>
+                    <div id="keywords" class="keywords-box"></div>
                 </div>
             </div>
         </section>
@@ -284,6 +304,7 @@
             const emptyState = document.getElementById("emptyState");
             const errorDiv = document.getElementById("error");
             const loadingDiv = document.getElementById("loading");
+            const analyzeButton = document.getElementById("analyzeButton");
 
             resultDiv.style.display = "none";
             emptyState.style.display = "block";
@@ -298,6 +319,8 @@
             }
 
             loadingDiv.textContent = "Analyzing text with AI...";
+            analyzeButton.disabled = true;
+            analyzeButton.textContent = "Analyzing...";
 
             try {
                 const response = await fetch("/full-analysis", {
@@ -320,6 +343,10 @@
                 document.getElementById("averageWordLength").textContent = data.analysis.average_word_length;
                 document.getElementById("summary").textContent = data.summary;
 
+                document.getElementById("keywords").innerHTML = data.keywords
+                    .map(keyword => `<span class="keyword">${keyword}</span>`)
+                    .join("");
+
                 emptyState.style.display = "none";
                 resultDiv.style.display = "block";
             } catch (error) {
@@ -327,6 +354,8 @@
                 errorDiv.style.display = "block";
             } finally {
                 loadingDiv.textContent = "";
+                analyzeButton.disabled = false;
+                analyzeButton.textContent = "Analyze Text";
             }
         }
 
@@ -336,6 +365,8 @@
             document.getElementById("emptyState").style.display = "block";
             document.getElementById("error").style.display = "none";
             document.getElementById("loading").textContent = "";
+            document.getElementById("summary").textContent = "";
+            document.getElementById("keywords").innerHTML = "";
         }
 
         function loadExample() {

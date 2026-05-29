@@ -4,7 +4,11 @@ import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 
-from ai_client import extract_ai_keywords, generate_ai_summary
+from ai_client import (
+    extract_ai_keywords,
+    generate_ai_full_insight,
+    generate_ai_summary,
+)
 from analyzer import analyze_text
 from logger_config import configure_logging
 from schemas import (
@@ -83,17 +87,19 @@ def full_analysis(request: TextRequest):
     analysis = analyze_text(request.text)
 
     try:
-        summary = generate_ai_summary(request.text)
+        ai_insight = generate_ai_full_insight(request.text)
+
         return {
             "analysis": analysis,
-            "summary": summary,
+            "summary": ai_insight["summary"],
+            "keywords": ai_insight["keywords"],
         }
     except ValueError as error:
         raise HTTPException(status_code=500, detail=str(error))
     except Exception:
         raise HTTPException(
             status_code=502,
-            detail="AI summary service is currently unavailable"
+            detail="AI full analysis service is currently unavailable"
         )
     
 

@@ -22,6 +22,7 @@ class SummaryResponse(BaseModel):
 class FullAnalysisResponse(BaseModel):
     analysis: TextAnalysisResponse
     summary: str
+    keywords: list[str]
 
 class KeywordsResponse(BaseModel):
     keywords: list[str]

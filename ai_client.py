@@ -1,3 +1,4 @@
+import json
 import os
 
 from dotenv import load_dotenv
@@ -63,3 +64,34 @@ Return only the keywords, separated by commas.
     ]
 
     return keywords
+
+def generate_ai_full_insight(text):
+    client = get_gemini_client()
+
+    prompt = f"""
+Analyze the following text.
+
+Text:
+{text}
+
+Return only valid JSON in this exact format:
+{{
+    "summary": "short clear summary here",
+    "keywords": ["keyword 1", "keyword 2", "keyword 3", "keyword 4", "keyword 5"]
+}}
+"""
+
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+    )
+
+    raw_text = response.text.strip()
+    raw_text = raw_text.replace("```json", "").replace("```", "").strip()
+
+    data = json.loads(raw_text)
+
+    return {
+        "summary": data["summary"],
+        "keywords": data["keywords"],
+    }
