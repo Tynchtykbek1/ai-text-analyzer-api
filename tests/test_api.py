@@ -15,6 +15,16 @@ def test_home_endpoint():
     }
 
 
+def test_health_endpoint():
+    response = client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "status": "ok",
+        "service": "ai-text-analyzer-api"
+    }
+
+
 def test_analyze_endpoint():
     response = client.post(
         "/analyze",

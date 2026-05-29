@@ -45,6 +45,13 @@ async def log_requests(request: Request, call_next):
 def home():
     return {"message": "AI Text Analyzer API is running"}
 
+@app.get("/health")
+def health_check():
+    return {
+        "status": "ok",
+        "service": "ai-text-analyzer-api"
+    }
+
 @app.get("/ui")
 def ui():
     return FileResponse("frontend/index.html")
