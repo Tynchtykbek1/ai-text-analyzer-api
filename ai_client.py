@@ -6,6 +6,8 @@ from google import genai
 
 load_dotenv()
 
+GEMINI_MODEL = "gemini-2.5-flash"
+
 
 def get_gemini_client():
     api_key = os.getenv("GEMINI_API_KEY")
@@ -29,8 +31,35 @@ Return only the summary.
 """
 
     response = client.models.generate_content(
-        model="gemini-3.5-flash",
+        model=GEMINI_MODEL,
         contents=prompt,
     )
 
     return response.text
+
+
+def extract_ai_keywords(text):
+    client = get_gemini_client()
+
+    prompt = f"""
+Extract 5 important keywords or key phrases from the following text.
+
+Text:
+{text}
+
+Return only the keywords, separated by commas.
+"""
+
+    response = client.models.generate_content(
+        model=GEMINI_MODEL,
+        contents=prompt,
+    )
+
+    keywords_text = response.text
+    keywords = [
+        keyword.strip()
+        for keyword in keywords_text.split(",")
+        if keyword.strip()
+    ]
+
+    return keywords
