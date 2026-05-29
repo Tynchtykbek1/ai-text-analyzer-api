@@ -4,11 +4,12 @@ import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse
 
-from ai_client import generate_ai_summary
+from ai_client import extract_ai_keywords, generate_ai_summary
 from analyzer import analyze_text
 from logger_config import configure_logging
 from schemas import (
     FullAnalysisResponse,
+    KeywordsResponse,
     SummaryResponse,
     TextAnalysisResponse,
     TextRequest,
@@ -93,4 +94,18 @@ def full_analysis(request: TextRequest):
         raise HTTPException(
             status_code=502,
             detail="AI summary service is currently unavailable"
+        )
+    
+
+@app.post("/keywords", response_model=KeywordsResponse)
+def keywords(request: TextRequest):
+    try:
+        extracted_keywords = extract_ai_keywords(request.text)
+        return {"keywords": extracted_keywords}
+    except ValueError as error:
+        raise HTTPException(status_code=500, detail=str(error))
+    except Exception:
+        raise HTTPException(
+            status_code=502,
+            detail="AI keyword extraction service is currently unavailable"
         )
