@@ -135,3 +135,54 @@ def test_full_analysis_endpoint_handles_ai_error(monkeypatch):
     assert response.json() == {
         "detail": "AI summary service is currently unavailable"
     }
+
+
+
+def test_keywords_endpoint_with_mock(monkeypatch):
+    def fake_extract_ai_keywords(text):
+        return [
+            "AI engineering",
+            "backend development",
+            "API integration",
+            "testing",
+            "Docker",
+        ]
+
+    monkeypatch.setattr("app.extract_ai_keywords", fake_extract_ai_keywords)
+
+    response = client.post(
+        "/keywords",
+        json={
+            "text": "AI engineering requires backend development, API integration, testing, and Docker."
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "keywords": [
+            "AI engineering",
+            "backend development",
+            "API integration",
+            "testing",
+            "Docker",
+        ]
+    }
+
+
+def test_keywords_endpoint_handles_ai_error(monkeypatch):
+    def fake_extract_ai_keywords(text):
+        raise Exception("Gemini API error")
+
+    monkeypatch.setattr("app.extract_ai_keywords", fake_extract_ai_keywords)
+
+    response = client.post(
+        "/keywords",
+        json={
+            "text": "AI engineering requires reliable error handling."
+        },
+    )
+
+    assert response.status_code == 502
+    assert response.json() == {
+        "detail": "AI keyword extraction service is currently unavailable"
+    }
